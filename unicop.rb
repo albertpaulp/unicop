@@ -1,12 +1,11 @@
 class Unicop
   require 'logger'
+  require 'yaml'
 
-  SCALE_UP_TRIGGER_MEM_PER = 30
-  SCALE_DOWN_TRIGGER_MEM_PER = 5
-  MAX_WORKERS = 3
-  MIN_WORKERS = 2
+  attr_reader :config
 
-  def new
+  def initialize
+    load_config
   end
 
   def perform
@@ -22,23 +21,23 @@ class Unicop
   private
 
   def can_scale_up?
-    return available_mem_percent > SCALE_UP_TRIGGER_MEM_PER unless max_worker_threshold?
+    return available_mem_percent > config['scale_up_trigger_mem_per'] unless max_worker_threshold?
 
     false
   end
 
   def can_scale_down?
-    return available_mem_percent < SCALE_DOWN_TRIGGER_MEM_PER unless min_worker_threshold?
+    return available_mem_percent < config['scale_down_trigger_mem_per'] unless min_worker_threshold?
 
     false
   end
 
   def max_worker_threshold?
-    active_worker_count >= MAX_WORKERS
+    active_worker_count >= config['max_workers']
   end
 
   def min_worker_threshold?
-    active_worker_count <= MIN_WORKERS
+    active_worker_count <= config['min_workers']
   end
 
   def increase_worker
@@ -69,6 +68,10 @@ class Unicop
 
   def available_mem_percent
     (available_memory/total_memory*100).to_i
+  end
+
+  def load_config
+    @config ||= YAML.load_file('config.yml')
   end
 
   def chars_to_number(chars)
@@ -108,10 +111,10 @@ class Unicop
     log("Available Memory Percentage: #{available_mem_percent} %", false)
     log("Number of workers: #{active_worker_count}", false)
     log("PID of unicorn master: #{pid_of_unicorn_master}", false)
-    log("MAX_WORKERS: #{MAX_WORKERS}", false)
-    log("MIN_WORKERS: #{MIN_WORKERS}", false)
-    log("SCALE_UP_TRIGGER_MEM_PER: #{SCALE_UP_TRIGGER_MEM_PER}%", false)
-    log("SCALE_DOWN_TRIGGER_MEM_PER: #{SCALE_DOWN_TRIGGER_MEM_PER}%", false)
+    log("MAX_WORKERS: #{config['max_workers']}", false)
+    log("MIN_WORKERS: #{config['min_workers']}", false)
+    log("SCALE_UP_TRIGGER_MEM_PER: #{config['scale_up_trigger_mem_per']}%", false)
+    log("SCALE_DOWN_TRIGGER_MEM_PER: #{config['scale_down_trigger_mem_per']}%", false)
     log("Can increase worker: #{can_scale_up?}", false)
     log("Can decrease worker: #{can_scale_down?}", false)
   end
