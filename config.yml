@@ -1,0 +1,4 @@
+scale_up_trigger_mem_per: 30
+scale_down_trigger_mem_per: 5
+max_workers: 3
+min_workers: 2
