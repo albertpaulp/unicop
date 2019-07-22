@@ -56,19 +56,27 @@ class Unicop
   end
 
   def pid_of_unicorn_master
-    `ps aux | grep "unicorn_rails master" | grep -v "grep" | cut -d " " -f 4`.strip.to_i
+    chars_to_number(`ps aux | grep "unicorn_rails master" | grep -v "grep" | cut -d " " -f 2-`)
   end
 
   def available_memory
-    `grep "MemAvailable" /proc/meminfo | cut -d " " -f 6`.strip.to_f/1024
+    chars_to_mbs(`grep "MemAvailable" /proc/meminfo`)
   end
 
   def total_memory
-    `grep "MemTotal" /proc/meminfo | cut -d " " -f 9`.strip.to_f/1024
+    chars_to_mbs(`grep "MemTotal" /proc/meminfo`)
   end
 
   def available_mem_percent
     (available_memory/total_memory*100).to_i
+  end
+
+  def chars_to_number(chars)
+    chars.match('\d+').to_s.to_i
+  end
+
+  def chars_to_mbs(chars)
+    chars.match('\d+').to_s.to_f/1024
   end
 
   def system_compatible?
