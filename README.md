@@ -24,9 +24,14 @@ Configuration is stored in `config.yml` in project directory. Update this to sui
 
 **min_workers**: Minimum number of workers allowed.
 
+**old_files_to_keep**: Number of old log files to keep.
+
+**max_file_size_in_bytes**: Maximum log file size before log rotation.
+
 ## Compatibility
 
 Runs on standard linux distributions, throws error and exit if tried to run on non-linux environments.
+Requires Ruby 1.9.3+.
 
 ## Logging
 
