@@ -92,7 +92,11 @@ class Unicop
   end
 
   def logger
-    @log ||= Logger.new('unicop.log', 'daily')
+    @log ||= Logger.new(
+      'unicop.log',
+      config['log']['old_files_to_keep'],
+      config['log']['max_file_size_in_bytes'],
+    )
   end
 
   def log(message, file = true)
@@ -111,12 +115,15 @@ class Unicop
     log("Available Memory Percentage: #{available_mem_percent} %", false)
     log("Number of workers: #{active_worker_count}", false)
     log("PID of unicorn master: #{pid_of_unicorn_master}", false)
-    log("MAX_WORKERS: #{config['max_workers']}", false)
-    log("MIN_WORKERS: #{config['min_workers']}", false)
-    log("SCALE_UP_TRIGGER_MEM_PER: #{config['scale_up_trigger_mem_per']}%", false)
-    log("SCALE_DOWN_TRIGGER_MEM_PER: #{config['scale_down_trigger_mem_per']}%", false)
     log("Can increase worker: #{can_scale_up?}", false)
     log("Can decrease worker: #{can_scale_down?}", false)
+    log("---Configuration---")
+    log("max_workers: #{config['max_workers']}", false)
+    log("min_workers: #{config['min_workers']}", false)
+    log("scale_up_trigger_mem_per: #{config['scale_up_trigger_mem_per']}%", false)
+    log("scale_down_trigger_mem_per: #{config['scale_down_trigger_mem_per']}%", false)
+    log("old_files_to_keep: #{config['log']['old_files_to_keep']}", false)
+    log("max_file_size_in_bytes: #{config['log']['max_file_size_in_bytes']}", false)
   end
 end
 
